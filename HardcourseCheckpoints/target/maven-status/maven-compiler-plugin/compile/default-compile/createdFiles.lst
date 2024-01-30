@@ -1,0 +1,8 @@
+com\hardcourse\hardcoursecheckpoints\Commands\MakeCPCommand.class
+com\hardcourse\hardcoursecheckpoints\Events\onRespawn.class
+com\hardcourse\hardcoursecheckpoints\Utils\CheckpointData.class
+com\hardcourse\hardcoursecheckpoints\Utils\CheckpointFileManager.class
+com\hardcourse\hardcoursecheckpoints\Utils\PlayerCheckpoint.class
+com\hardcourse\hardcoursecheckpoints\Utils\WarningSender.class
+com\hardcourse\hardcoursecheckpoints\HardcourseCheckpoints.class
+com\hardcourse\hardcoursecheckpoints\Events\onWalk.class

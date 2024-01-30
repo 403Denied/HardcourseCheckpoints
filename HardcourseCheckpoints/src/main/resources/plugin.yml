@@ -1,0 +1,9 @@
+name: HardcourseCheckpoints
+version: '${project.version}'
+main: com.hardcourse.hardcoursecheckpoints.HardcourseCheckpoints
+api-version: '1.20'
+commands:
+  makecpcommand:
+    description: Make a checkpoint
+    usage: /makecp
+    aliases: [makecp, makecheckpoint]
