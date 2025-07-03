@@ -48,6 +48,6 @@ public class DoubleJump implements Listener {
             player.getInventory().setItemInMainHand(null);
         }
 
-        player.sendMessage(ChatColor.AQUA + "You double jumped!");
+        // Removed the player.sendMessage line
     }
 }

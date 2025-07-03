@@ -46,6 +46,9 @@ commands:
     description: "Set the level of a player."
     usage: "/setlevel <player> <level>"
     permission: hardcourse.admin
+  shop:
+    description: "Provides the player with the shop paper"
+    usage: "/shop"
   reloadhardcourseconfig:
     description: "Reload the Hardcourse plugin configuration."
     usage: "/reloadhardcourseconfig"

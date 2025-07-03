@@ -79,12 +79,6 @@ public class onWalk implements Listener {
                 // Update highest checkpoint
                 highestCheckpoint.put(playerUUID, checkpointNumber);
 
-                // Send checkpoint reached action bar message
-                String checkpointMessage = ChatColor.RED + "Checkpoint reached: " + ChatColor.DARK_RED
-                        + checkpointNumber.toString().replace(".0", "") + ChatColor.RESET + "!";
-                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(checkpointMessage));
-                p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-
                 // Add random points between 10 and 20
                 int pointsToAdd = 10 + random.nextInt(11);
                 pointsManager.addPoints(playerUUID, pointsToAdd);

@@ -2,18 +2,27 @@ package com.denied403.hardcoursecheckpoints.Points;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class ShopItem implements Listener {
+public class ShopItem implements Listener, CommandExecutor {
 
-    // Gives the player the "Points Shop" paper in hotbar slot 7 (8th slot)
-    public void givePointsShopChest(Player player) {
+    // Gives the player the "Points Shop" paper in hotbar slot 4 (middle slot)
+    public void givePointsShopPaper(Player player) {
+        // Avoid giving duplicates
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (isPointsShopPaper(item)) {
+                return;
+            }
+        }
+
         ItemStack paper = new ItemStack(Material.PAPER);
         ItemMeta meta = paper.getItemMeta();
         if (meta != null) {
@@ -21,28 +30,34 @@ public class ShopItem implements Listener {
             paper.setItemMeta(meta);
         }
 
-        player.getInventory().setItem(4, paper);
+        player.getInventory().setItem(4, paper); // 4 = 5th slot (0-based)
     }
 
-    // Check if an item is the protected Points Shop paper
-    private boolean isPointsShopChest(ItemStack item) {
-        if (item == null) return false;
-        if (item.getType() != Material.PAPER) return false;
-
+    // Check if the item is the special shop paper
+    private boolean isPointsShopPaper(ItemStack item) {
+        if (item == null || item.getType() != Material.PAPER) return false;
         ItemMeta meta = item.getItemMeta();
-        if (meta == null) return false;
-
-        String displayName = meta.getDisplayName();
-        return displayName != null && displayName.equals(ChatColor.translateAlternateColorCodes('&', "&c&lPoints Shop"));
+        return meta != null && ChatColor.stripColor(meta.getDisplayName()).equals("Points Shop");
     }
 
-    // Prevent the paper from being dropped
+    // Prevent dropping the shop paper
     @EventHandler
     public void onPlayerDropItem(PlayerDropItemEvent event) {
-        ItemStack dropped = event.getItemDrop().getItemStack();
-
-        if (isPointsShopChest(dropped)) {
+        if (isPointsShopPaper(event.getItemDrop().getItemStack())) {
             event.setCancelled(true);
         }
+    }
+
+    // Handle the /shop command
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(ChatColor.RED + "Only players can use this command.");
+            return true;
+        }
+
+        givePointsShopPaper(player);
+        player.sendMessage(ChatColor.GREEN + "You have received the Points Shop paper.");
+        return true;
     }
 }

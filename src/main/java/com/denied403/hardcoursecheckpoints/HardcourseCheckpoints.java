@@ -101,9 +101,10 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
 
         shopItem = new ShopItem();
         getServer().getPluginManager().registerEvents(shopItem, this);
+        getCommand("shop").setExecutor(shopItem);
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-            shopItem.givePointsShopChest(player);
+            shopItem.givePointsShopPaper(player);
         }
 
         if(DiscordEnabled) {
@@ -154,6 +155,8 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getServer().getPluginManager().registerEvents(new BanListener(this), this);
         getServer().getPluginManager().registerEvents(new JumpBoost(), this);
         getServer().getPluginManager().registerEvents(new DoubleJump(), this);
+        getServer().getPluginManager().registerEvents(new onWorldChange(), this);
+        getServer().getPluginManager().registerEvents(new onQuit(), this);
 
 
         WordSyncListener.updateFilterWords();
