@@ -69,6 +69,55 @@ public class PointsShop implements Listener {
         return feather;
     }
 
+    private ItemStack getJumpBoostAllItem() {
+        ItemStack boots = new ItemStack(Material.DIAMOND_BOOTS);
+        ItemMeta meta = boots.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&b&lBuy everyone jump boost"));
+
+            List<String> lore = new ArrayList<>();
+            lore.add(ChatColor.GRAY + "Not yet configured");
+            meta.setLore(lore);
+
+            meta.setUnbreakable(true);
+            meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
+            boots.setItemMeta(meta);
+        }
+        return boots;
+    }
+
+    private ItemStack getTempCheckpointItem() {
+        ItemStack jukebox = new ItemStack(Material.JUKEBOX);
+        ItemMeta meta = jukebox.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&d&lTemporary Checkpoint"));
+
+            List<String> lore = new ArrayList<>();
+            lore.add(ChatColor.GRAY + "Not yet configured");
+            meta.setLore(lore);
+
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            jukebox.setItemMeta(meta);
+        }
+        return jukebox;
+    }
+
+    private ItemStack getCosmeticsItem() {
+        ItemStack chest = new ItemStack(Material.CHEST);
+        ItemMeta meta = chest.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&c&lCosmetics"));
+
+            List<String> lore = new ArrayList<>();
+            lore.add(ChatColor.GRAY + "Not yet configured");
+            meta.setLore(lore);
+
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            chest.setItemMeta(meta);
+        }
+        return chest;
+    }
+
     @EventHandler
     public void onPlayerRightClick(PlayerInteractEvent event) {
         if (!event.hasItem()) return;
@@ -78,9 +127,13 @@ public class PointsShop implements Listener {
             Player player = event.getPlayer();
             event.setCancelled(true);
 
-            Inventory pointsShopInventory = Bukkit.createInventory(null, 27, ChatColor.DARK_GREEN + "Points Shop");
+            Inventory pointsShopInventory = Bukkit.createInventory(null, 36, "Points Shop");
             pointsShopInventory.setItem(10, getJumpBootsItem());
             pointsShopInventory.setItem(12, getDoubleJumpItem());
+            pointsShopInventory.setItem(14, getJumpBoostAllItem());
+            pointsShopInventory.setItem(16, getTempCheckpointItem());
+            pointsShopInventory.setItem(31, getCosmeticsItem());
+
             player.openInventory(pointsShopInventory);
         }
     }
@@ -93,9 +146,7 @@ public class PointsShop implements Listener {
         String title = ChatColor.stripColor(event.getView().getTitle());
         if (!title.equalsIgnoreCase("Points Shop")) return;
 
-        // Prevent taking items from the GUI
         if (event.getClickedInventory().equals(event.getWhoClicked().getInventory())) return;
-
         event.setCancelled(true);
 
         if (event.getClick().isShiftClick() || !event.getClick().isLeftClick()) return;
@@ -141,6 +192,21 @@ public class PointsShop implements Listener {
                         ChatColor.RED + "Not enough points! Need 2000.",
                         40L);
             }
+        }
+
+        if (name.equalsIgnoreCase("Buy everyone jump boost")) {
+            player.sendMessage(ChatColor.YELLOW + "This feature is not yet configured.");
+            player.closeInventory();
+        }
+
+        if (name.equalsIgnoreCase("Temporary Checkpoint")) {
+            player.sendMessage(ChatColor.YELLOW + "This feature is not yet configured.");
+            player.closeInventory();
+        }
+
+        if (name.equalsIgnoreCase("Cosmetics")) {
+            player.sendMessage(ChatColor.YELLOW + "This feature is not yet configured.");
+            player.closeInventory();
         }
     }
 }
