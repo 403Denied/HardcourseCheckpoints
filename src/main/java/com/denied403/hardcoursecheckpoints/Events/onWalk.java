@@ -13,7 +13,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Random;
 import java.util.UUID;
@@ -85,13 +84,12 @@ public class onWalk implements Listener {
 
                 // Notify player of points gained as a subtitle in the middle of the screen (empty title)
                 String pointsMessage = ChatColor.GREEN + "+" + pointsToAdd + " points for completing level "
-                        + checkpointNumber.toString().replace(".0", "");
+                        + previousCheckpoint.toString().replace(".0", "");
                 sendPointsSubtitle(p, pointsMessage);
 
                 // Set respawn location
                 p.setRespawnLocation(p.getLocation().add(0, 1, 0), true);
 
-                // Season completion handling
                 if (checkpointNumber == 543.0 && p.getWorld().getName().equals("Season1")) {
                     if (previousCheckpoint >= 542.0) {
                         if (isDiscordEnabled()) sendMessage(p, null, "winning", "1", null);
@@ -136,8 +134,6 @@ public class onWalk implements Listener {
 
     // New method: sends the subtitle with empty title, showing the points message for ~3 seconds
     private void sendPointsSubtitle(Player player, String pointsMessage) {
-        player.sendTitle("", pointsMessage, 5, 60, 5);  // fadeIn=5, stay=60 (3 sec), fadeOut=5 ticks
+        player.sendTitle("", pointsMessage, 5, 40, 5);  // fadeIn=5, stay=60 (3 sec), fadeOut=5 ticks
     }
-
-    // Removed sendTemporaryPointsMessageRepeated usage since no longer needed
 }

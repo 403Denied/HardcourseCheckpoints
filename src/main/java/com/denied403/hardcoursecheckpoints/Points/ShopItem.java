@@ -15,7 +15,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class ShopItem implements Listener, CommandExecutor {
 
     // Gives the player the "Points Shop" paper in hotbar slot 4 (middle slot)
-    public void givePointsShopPaper(Player player) {
+    public static void givePointsShopPaper(Player player) {
         // Avoid giving duplicates
         for (ItemStack item : player.getInventory().getContents()) {
             if (isPointsShopPaper(item)) {
@@ -34,7 +34,7 @@ public class ShopItem implements Listener, CommandExecutor {
     }
 
     // Check if the item is the special shop paper
-    private boolean isPointsShopPaper(ItemStack item) {
+    public static boolean isPointsShopPaper(ItemStack item) {
         if (item == null || item.getType() != Material.PAPER) return false;
         ItemMeta meta = item.getItemMeta();
         return meta != null && ChatColor.stripColor(meta.getDisplayName()).equals("Points Shop");

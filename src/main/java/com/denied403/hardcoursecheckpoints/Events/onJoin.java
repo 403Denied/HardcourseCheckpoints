@@ -5,21 +5,17 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.Location;
+import com.denied403.hardcoursecheckpoints.Points.ShopItem;
 
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.sendMessage;
 import static com.denied403.hardcoursecheckpoints.HardcourseCheckpoints.*;
-import static com.denied403.hardcoursecheckpoints.Scoreboard.ScoreboardMain.setScoreboard;
-
-import com.denied403.hardcoursecheckpoints.Points.ShopItem;
 
 public class onJoin implements Listener {
 
-    private final ShopItem shopItem = new ShopItem();
     @EventHandler
     public void onJoin(org.bukkit.event.player.PlayerJoinEvent event) {
         org.bukkit.entity.Player player = event.getPlayer();
@@ -34,10 +30,9 @@ public class onJoin implements Listener {
 
         player.getInventory().clear();
 
-        // Give points shop item using existing method
-        shopItem.givePointsShopPaper(player);
+        ShopItem.givePointsShopPaper(player);
 
-        // Create stuck clock item in slot 8
+
         Material killItem = Material.CLOCK;
         ItemStack killItemStack = new ItemStack(killItem);
         org.bukkit.inventory.meta.ItemMeta killItemMeta = killItemStack.getItemMeta();
@@ -59,11 +54,8 @@ public class onJoin implements Listener {
             World targetWorld = Bukkit.getServer().getWorld("Season1");
             Location spawnLocation = targetWorld.getSpawnLocation();
             player.teleport(spawnLocation);
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rWelcome to hardcourse. This server contains over 500 levels that will test your patience (and your will to live). Think it's worth it? &cYou may begin&r."));
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &rWelcome to hardcourse. This server contains over 1000 levels that will test your patience (and your will to live). Think it's worth it? &cYou may begin&r."));
             Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &r&c" + player.getDisplayName() + " &rhas joined for the first time. Welcome! &c[#" + Bukkit.getOfflinePlayers().length + "]"));
-        }
-        for(Player p : Bukkit.getOnlinePlayers()) {
-            setScoreboard(p);
         }
     }
 }

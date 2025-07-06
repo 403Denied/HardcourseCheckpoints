@@ -12,8 +12,5 @@ public class onClick implements Listener {
         if(event.getItem().getItemMeta().getDisplayName().equals(org.bukkit.ChatColor.RED + "" + org.bukkit.ChatColor.BOLD + "Stuck")){
             event.getPlayer().setHealth(0);
         }
-        else {
-            return;
-        }
     }
 }

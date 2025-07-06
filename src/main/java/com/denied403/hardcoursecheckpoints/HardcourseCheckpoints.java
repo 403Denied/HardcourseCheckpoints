@@ -12,16 +12,12 @@ import com.denied403.hardcoursecheckpoints.Utils.WordSyncListener;
 import com.denied403.hardcoursecheckpoints.Points.PointsCommand;
 import com.denied403.hardcoursecheckpoints.Points.PointsManager;
 import com.denied403.hardcoursecheckpoints.Points.PointsTabCompleter;
-import com.denied403.hardcoursecheckpoints.Utils.PermissionChecker;
-import com.denied403.hardcoursecheckpoints.Utils.WordSyncListener;
 import com.denied403.hardcoursecheckpoints.Points.PointsShop;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-
-import com.denied403.hardcoursecheckpoints.Points.ShopItem;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,6 +31,7 @@ import java.util.*;
 
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.jda;
 import static com.denied403.hardcoursecheckpoints.Discord.HardcourseDiscord.sendMessage;
+import static com.denied403.hardcoursecheckpoints.Scoreboard.ScoreboardMain.setScoreboard;
 
 public final class HardcourseCheckpoints extends JavaPlugin implements Listener {
     public static HashMap<UUID, Double> highestCheckpoint = new HashMap<>();
@@ -55,10 +52,6 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
     private File pointsFile;
     private FileConfiguration pointsConfig;
 
-    private PointsShop pointsShop;
-
-    private ShopItem shopItem;  // Add ShopItem instance
-
     private PointsManager pointsManager;
 
     public static Double getHighestCheckpoint(UUID player) {
@@ -76,39 +69,24 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
 
 
     public static HardcourseCheckpoints plugin;
-    private HardcourseDiscord discordBot;
 
     @Override
     public void onEnable() {
 
-        // Plugin startup logic
         plugin = this;
-
-        // Load config flags early so Discord messages and broadcasts behave correctly
-
-        plugin = this;
-
 
         DiscordEnabled = getConfig().getBoolean("discord-enabled");
         BroadcastEnabled = getConfig().getBoolean("broadcast-enabled");
         UnscrambleEnabled = getConfig().getBoolean("unscramble-enabled");
         messages = getConfig().getStringList("broadcast-messages");
 
-        pointsShop = new PointsShop(this);
+        PointsShop pointsShop = new PointsShop(this);
         getServer().getPluginManager().registerEvents(pointsShop, this);
 
         this.pointsManager = new PointsManager(this);
 
-        shopItem = new ShopItem();
-        getServer().getPluginManager().registerEvents(shopItem, this);
-        getCommand("shop").setExecutor(shopItem);
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            shopItem.givePointsShopPaper(player);
-        }
-
         if(DiscordEnabled) {
-            discordBot = new HardcourseDiscord(this);
+            HardcourseDiscord discordBot = new HardcourseDiscord(this);
             try {
                 discordBot.InitJDA();
             } catch (Exception e) {
@@ -123,7 +101,6 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         checkpointConfig = YamlConfiguration.loadConfiguration(checkpointFile);
         loadCheckpoints();
 
-        // --- New: Setup and load points config ---
         setupPointsConfig();
         loadPoints();
 
@@ -142,7 +119,6 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
 
         WordSyncListener wordSyncListener = new WordSyncListener(this);
         WordSyncListener.reloadMuteCache();
-        ChatReactions chatReactions = new ChatReactions(this);
         getServer().getPluginManager().registerEvents(new ChatReactions(this), this);
         getServer().getPluginManager().registerEvents(new onJoin(), this);
         getServer().getPluginManager().registerEvents(new onDrop(), this);
@@ -153,14 +129,10 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(wordSyncListener, this);
         getServer().getPluginManager().registerEvents(new BanListener(this), this);
-        getServer().getPluginManager().registerEvents(new JumpBoost(), this);
         getServer().getPluginManager().registerEvents(new DoubleJump(), this);
-        getServer().getPluginManager().registerEvents(new onWorldChange(), this);
-        getServer().getPluginManager().registerEvents(new onQuit(), this);
-
-
+        getServer().getPluginManager().registerEvents(new TempCheckpoint(), this);
+        Bukkit.getPluginManager().registerEvents(new JumpBoost(this), this);
         WordSyncListener.updateFilterWords();
-
         getCommand("resetcheckpoint").setExecutor(new CheckpointCommands(this));
         getCommand("resetallcheckpoints").setExecutor(new CheckpointCommands(this));
         getCommand("purgeinactive").setExecutor(new CheckpointCommands(this));
@@ -175,19 +147,21 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         getCommand("reloadhardcourseconfig").setExecutor(new reloadHardcourseConfig(this));
         getCommand("points").setExecutor(new PointsCommand(new PointsManager(this)));
         getCommand("points").setTabCompleter(new PointsTabCompleter());
+        getCommand("stuck").setExecutor(new Stuck());
+        getCommand("shop").setExecutor(new ShopItem());
 
 
         setupWordsConfig();
         setupCheckpointsConfig();
 
-        if(BroadcastEnabled) {
+        if(isBroadcastEnabled()) {
             Bukkit.getScheduler().runTaskTimer(this, () -> {
                 String message = messages.get(random.nextInt(messages.size()));
                 Bukkit.broadcastMessage(" ");
                 Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &r" + message));
                 Bukkit.broadcastMessage(" ");
             }, 0L, 20 * 60 * 5);
-        }//Runs every 5 mins
+        }
 
         if(UnscrambleEnabled) {
             new BukkitRunnable() {
@@ -199,6 +173,16 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
         }
 
         new PermissionChecker(this);
+
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    setScoreboard(player);
+                }
+            }
+        }.runTaskTimer(this, 0L, 20L);
     }
 
     public PointsManager getPointsManager() {
@@ -214,9 +198,6 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
             }
         }
         saveCheckpoints();
-
-
-        // --- New: Save points on disable ---
 
         savePoints();
     }

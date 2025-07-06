@@ -57,34 +57,37 @@ public class ChatReactions implements Listener {
     }
 
     public static void runGame(String word) {
-        currentWord = word;
-        scrambledWord = Shuffler.shuffleWord(currentWord);
-        MiniMessage mm = MiniMessage.miniMessage();
+        if(!gameActive) {
+            currentWord = word;
+            scrambledWord = Shuffler.shuffleWord(currentWord);
+            MiniMessage mm = MiniMessage.miniMessage();
 
-        for (Player p : Bukkit.getServer().getOnlinePlayers()) {
-            Component message = mm.deserialize("<red><bold>HARDCOURSE<reset> <hover:show_text:'" + scrambledWord + "'>Hover here for a word to unscramble.</hover>");
-            p.sendMessage(message);
-        }
-
-        gameActive = true;
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (gameActive) {
-                    Component endMsg = mm.deserialize("<red><bold>HARDCOURSE</bold></red> <reset>Time's Up! The correct word was <red>" + currentWord + "</red>");
-                    Bukkit.broadcast(endMsg);
-                    gameActive = false;
-                }
+            for (Player p : Bukkit.getServer().getOnlinePlayers()) {
+                Component message = mm.deserialize("<red><bold>HARDCOURSE<reset> <hover:show_text:'" + scrambledWord + "'>Hover here for a word to unscramble.</hover>");
+                p.sendMessage(message);
             }
-        }.runTaskLater(plugin, 600L); // Run after 30 seconds (600 ticks)
+            Bukkit.getServer().getLogger().info(ChatColor.translateAlternateColorCodes('&', "&c&lHARDCOURSE &fHover here for a word to unscramble: &c" + scrambledWord + "&f(" + currentWord + ")"));
+
+            gameActive = true;
+
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (gameActive) {
+                        Component endMsg = mm.deserialize("<red><bold>HARDCOURSE</bold></red> <reset>Time's Up! The correct word was <red>" + currentWord + "</red>");
+                        Bukkit.broadcast(endMsg);
+                        gameActive = false;
+                    }
+                }
+            }.runTaskLater(plugin, 600L); // Run after 30 seconds (600 ticks)
+        }
     }
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         if (gameActive && event.getMessage().equalsIgnoreCase(currentWord)) {
             Player p = event.getPlayer();
-            int points = 50 + random.nextInt(51); // Random between 50 and 100 inclusive
+            int points = 5 + random.nextInt(11);
 
             PointsManager pointsManager = ((HardcourseCheckpoints) plugin).getPointsManager();
             pointsManager.addPoints(p.getUniqueId(), points);
