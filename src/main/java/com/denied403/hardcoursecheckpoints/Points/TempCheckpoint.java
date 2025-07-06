@@ -24,21 +24,26 @@ public class TempCheckpoint implements Listener {
 
     @EventHandler
     public void onPlayerUseTempCheckpoint(PlayerInteractEvent event) {
-        // Only handle right-click block action with main hand
-        if (!event.getAction().toString().contains("RIGHT_CLICK_BLOCK")) return;
-        if (event.getHand() != EquipmentSlot.HAND) return; // ignore off-hand
+        if (event.getHand() != EquipmentSlot.HAND) return; // Only respond to main hand
 
         Player player = event.getPlayer();
-        Block clickedBlock = event.getClickedBlock();
-
-        if (clickedBlock == null) return; // just in case
-
         ItemStack itemInHand = player.getInventory().getItemInMainHand();
 
         if (!isTemporaryCheckpointBook(itemInHand)) return;
 
-        // Set respawn location to the block clicked, slightly above it
-        Location respawnLocation = clickedBlock.getLocation().add(0.5, 1, 0.5);
+        // Get block directly beneath the player's feet
+        Location belowPlayer = player.getLocation().subtract(0, 1, 0);
+        Block blockBelow = belowPlayer.getBlock();
+
+        // Check if block below is solid
+        if (blockBelow.getType() == Material.AIR) {
+            player.sendMessage(ChatColor.RED + "You can't place a temporary checkpoint here!");
+            event.setCancelled(true);
+            return;
+        }
+
+        // Set the respawn location slightly above the block
+        Location respawnLocation = blockBelow.getLocation().add(0.5, 1, 0.5);
         player.setBedSpawnLocation(respawnLocation, true);
 
         // Remove one Temporary Checkpoint book from player's main hand
@@ -50,7 +55,7 @@ public class TempCheckpoint implements Listener {
         }
 
         player.sendMessage(ChatColor.GREEN + "Temporary checkpoint set!");
-
         event.setCancelled(true);
     }
+
 }

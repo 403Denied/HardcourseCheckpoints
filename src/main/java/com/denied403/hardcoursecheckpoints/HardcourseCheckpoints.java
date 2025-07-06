@@ -12,7 +12,6 @@ import com.denied403.hardcoursecheckpoints.Utils.WordSyncListener;
 import com.denied403.hardcoursecheckpoints.Points.PointsCommand;
 import com.denied403.hardcoursecheckpoints.Points.PointsManager;
 import com.denied403.hardcoursecheckpoints.Points.PointsTabCompleter;
-import com.denied403.hardcoursecheckpoints.Points.PointsShop;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -117,6 +116,7 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
             }
         }.runTaskTimer(this, 0L, 20L);
 
+
         WordSyncListener wordSyncListener = new WordSyncListener(this);
         WordSyncListener.reloadMuteCache();
         getServer().getPluginManager().registerEvents(new ChatReactions(this), this);
@@ -188,7 +188,6 @@ public final class HardcourseCheckpoints extends JavaPlugin implements Listener 
     public PointsManager getPointsManager() {
         return this.pointsManager;
     }
-
     @Override
     public void onDisable() {
         if(DiscordEnabled) {
